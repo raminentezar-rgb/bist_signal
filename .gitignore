@@ -1,0 +1,11 @@
+Env/
+__pycache__/
+*.pyc
+.env
+.vscode/
+*.png
+*.log
+chart.png
+combined_equity.png
+test_yf.py
+test_yf_batch.py
