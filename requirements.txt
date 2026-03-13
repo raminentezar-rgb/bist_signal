@@ -8,3 +8,5 @@ python-dotenv
 ta
 schedule
 pytz
+altair
+scipy
