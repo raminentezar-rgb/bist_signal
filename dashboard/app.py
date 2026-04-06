@@ -64,8 +64,8 @@ for signal in signals:
                                  min_rs=min_rs, 
                                  min_winrate=min_winrate, 
                                  rsi_range=(rsi_min, rsi_max), 
-                                 require_breakout=True, 
-                                 require_vol_spike=True)
+                                 require_breakout=False, 
+                                 require_vol_spike=False)
 
         if not result:
             continue

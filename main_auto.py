@@ -22,7 +22,7 @@ def main():
         df_bist = signal['df_bist']
 
         # ---------- فیلترهای Ultra-Professional ----------
-        result = evaluate_signal(df, df_bist, require_breakout=True, require_vol_spike=True)
+        result = evaluate_signal(df, df_bist, require_breakout=False, require_vol_spike=False)
 
         if not result:
             continue
