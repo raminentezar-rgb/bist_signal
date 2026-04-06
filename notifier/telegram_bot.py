@@ -7,11 +7,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+# استفاده از لیست آیدی‌ها برای پشتیبانی از چند کانال/کاربر
+CHAT_IDS = [cid.strip() for cid in os.getenv("TELEGRAM_CHAT_ID", "").split(",") if cid.strip()]
 
 def send_telegram(message):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, data={"chat_id": CHAT_ID, "text": message, "parse_mode":"Markdown"})
+    for chat_id in CHAT_IDS:
+        try:
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+            requests.post(url, data={"chat_id": chat_id, "text": message, "parse_mode":"Markdown"})
+        except Exception as e:
+            print(f"Error sending to {chat_id}: {e}")
 
 def send_chart(df, title="Chart"):
     plt.figure(figsize=(8,4))
@@ -21,6 +26,11 @@ def send_chart(df, title="Chart"):
     plt.tight_layout()
     plt.savefig("chart.png")
     plt.close()
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
-    with open("chart.png", "rb") as photo:
-        requests.post(url, data={"chat_id": CHAT_ID}, files={"photo": photo})
+    
+    for chat_id in CHAT_IDS:
+        try:
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+            with open("chart.png", "rb") as photo:
+                requests.post(url, data={"chat_id": chat_id}, files={"photo": photo})
+        except Exception as e:
+            print(f"Error sending chart to {chat_id}: {e}")

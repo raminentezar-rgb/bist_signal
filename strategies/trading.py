@@ -22,9 +22,12 @@ def calculate_trade(df):
     
     return entry, stop, target
 
-def evaluate_signal(df, df_bist, min_rs=1.0, min_winrate=50, rsi_range=(40, 70), require_breakout=True, require_vol_spike=True):
+def evaluate_signal(df, df_bist, min_rs=0.0, min_winrate=40, rsi_range=(40, 75), require_breakout=False, require_vol_spike=False):
     """
-    ارزیابی و فیلتر کردن سیگنال بر اساس استراتژی و بازگرداندن اطلاعات ورود در صورت موفقیت
+    ارزیابی و فیلتر کردن سیگنال بر اساس استراتژی.
+    - min_rs: اکنون تفاوت بازدهی است (۰ یعنی سهم برابر با شاخص عمل کرده)
+    - min_winrate: کاهش به ۴۰٪ برای افزایش تعداد سیگنال‌های با پتانسیل
+    - rsi_range: کمی افزایش بازه بالا به ۷۵
     """
     rs = relative_strength(df, df_bist)
     ema20 = calculate_ema(df, 20).iloc[-1]
@@ -36,22 +39,27 @@ def evaluate_signal(df, df_bist, min_rs=1.0, min_winrate=50, rsi_range=(40, 70),
     
     last_close = df['Close'].iloc[-1]
     
+    # ---------------- فیلترها ----------------
     if require_vol_spike and not vol_spike:
         return None
     if require_breakout and not breakout:
         return None
         
+    # قدرت نسبی مثبت یعنی سهم بهتر از بازار است (Alpha > 0)
     if rs < min_rs:
         return None
         
+    # روند صوتی (قیمت بالای میانگین متحرک)
     if last_close < ema20:
         return None
         
+    # مومنتوم (RSI در محدوده غیر اشباع)
     if not (rsi_range[0] <= rsi14 <= rsi_range[1]):
         return None
         
     entry, stop, target = calculate_trade(df)
     
+    # بکتست کوتاه‌مدت برای بررسی رفتار تاریخی سهم با این استراتژی
     equity, winrate = calculate_historical_winrate(df)
     
     if winrate * 100 < min_winrate:
